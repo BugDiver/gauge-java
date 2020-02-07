@@ -1,20 +1,33 @@
-name: Deploy
-
-on: [deployment]
-
+name: Release on PR Merge
+on:
+  pull_request:
+    types: [closed]
 jobs:
-  deploy:
-    name: Create Draft with assets
+  release-and-bump-version:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'SkipRelease')
     runs-on: macos-latest
     env:
+      MAVEN_GPG_SIGN_KEY: '${{ secrets.MAVEN_GPG_SIGN_KEY }}'
+      username: '${{ secrets.maven_deploy_username }}'
+      password: '${{ secrets.maven_deploy_password }}'
+      passphrase: '${{ secrets.gpg_passphrase }}'
       GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      CI: true
+
     steps:
       - uses: actions/checkout@v1
-
-      - name: Setup java
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: '12.x.x'
+
+      - name: setup
+        run: |
+          # echo -e "$MAVEN_GPG_SIGN_KEY" | gpg --import --batch -
+          # gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys $gpgkey
+          # rm -rf $HOME/.m2
+          # mkdir -p $HOME/.m2
+          # echo -e "<settings>\n<servers>\n<server>\n<id>ossrh</id>\n<username>$username</username>\n<password>$password</password>\n</server>\n</servers>\n</settings>" > $HOME/.m2/settings.xml
 
       - name: Build artifacts
         run: |
@@ -23,7 +36,7 @@ jobs:
       - name: Install hub
         run: brew install hub
 
-      - name: update
+      - name: Deploy on github
         run: |
           cd artifacts
           if [ -z "$version" ]; then
@@ -42,7 +55,7 @@ jobs:
           release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" gauge-java getgauge)
           echo "$release_description" >>desc.txt
           echo "Creating new draft for release v$version"
-          hub release create -d -F ./desc.txt "v$version"
+          hub release create -F ./desc.txt "v$version"
           rm -rf desc.txt
           echo "Start uploading assets..."
           for i in $(ls $artifacts); do
@@ -52,6 +65,19 @@ jobs:
                   exit 1
               fi
           done
+
+      - name: Deploy on maven central
+        run: |
+          # mvn -q clean deploy -Dgpg.passphrase=$passphrase
+
+      - name: Bump up version
+        run: |
+          python update_version.py
+          git config --global user.name 'Github Actions'
+          git config --global user.email 'actions@github.com'
+          git commit -am "Bumping up -> {}"
+          git show HEAD
+          # git push origin master
 
       - name: 'deployment success'
         if: success()
