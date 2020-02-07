@@ -4,8 +4,8 @@ on: [deployment]
 
 jobs:
   build:
-    name: Deploy to maven central
-    runs-on: ubuntu-latest
+    name: Deploy gauge-java
+    runs-on: macos-latest
     env:
       MAVEN_GPG_SIGN_KEY: '${{ secrets.MAVEN_GPG_SIGN_KEY }}'
       username: '${{ secrets.maven_deploy_username }}'

@@ -1,7 +1,7 @@
 name: Release on PR Merge
 on:
   pull_request:
-    types: closed
+    types: [closed]
 jobs:
   release-and-bump-version:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'SkipRelease')
