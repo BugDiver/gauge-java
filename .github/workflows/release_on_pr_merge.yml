@@ -73,11 +73,9 @@ jobs:
 
       - name: Bump up version
         run: |
-          git status
-          git checkout master
-          git pull --rebase
+          git checkout master && git pull --rebase
           version=$(python update_version.py)
-          git config --global user.name 'Github Actions'
-          git config --global user.email 'actions@github.com'
+          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
           git commit -am "Bumping up -> $version"
           git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/BugDiver/gauge-java.git" origin master
