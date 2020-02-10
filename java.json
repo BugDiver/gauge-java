@@ -1,46 +1,46 @@
 {
     "run": {
         "windows": [
-            "launcher.cmd", 
+            "launcher.cmd",
             "start"
-        ], 
+        ],
         "darwin": [
-            "launcher.sh", 
+            "launcher.sh",
             "start"
-        ], 
+        ],
         "linux": [
-            "launcher.sh", 
+            "launcher.sh",
             "start"
         ]
-    }, 
-    "description": "Java support for gauge", 
-    "lib": "libs", 
-    "gRPCSupport": true, 
-    "lspLangId": "java", 
+    },
+    "description": "Java support for gauge",
+    "lib": "libs",
+    "gRPCSupport": true,
+    "lspLangId": "java",
     "init": {
         "windows": [
-            "launcher.cmd", 
+            "launcher.cmd",
             "init"
-        ], 
+        ],
         "darwin": [
-            "launcher.sh", 
+            "launcher.sh",
             "init"
-        ], 
+        ],
         "linux": [
-            "launcher.sh", 
+            "launcher.sh",
             "init"
         ]
-    }, 
-    "version": "0.7.5", 
+    },
+    "version": "0.7.4",
     "gaugeVersionSupport": {
-        "minimum": "1.0.6", 
+        "minimum": "1.0.7",
         "maximum": ""
-    }, 
-    "multithreaded": false, 
+    },
+    "multithreaded": false,
     "install": {
-        "windows": [], 
-        "darwin": [], 
+        "windows": [],
+        "darwin": [],
         "linux": []
-    }, 
+    },
     "id": "java"
 }
