@@ -22,12 +22,13 @@ def update_version():
     return new_version
 
 
-def update_pom():
-    v = update_version()
+def update_pom(version):
     c = "mvn versions:set-property -Dproperty=projectVersion -DnewVersion={0}"
-    check_output(c.format(v), shell=True)
-
+    check_output(c.format(version), shell=True)
+    os.remove("pom.xml.versionsBackup")
 
 
 if __name__ == "__main__":
-    update_pom()
+    version = update_version()
+    update_pom(version)
+    print(version)
