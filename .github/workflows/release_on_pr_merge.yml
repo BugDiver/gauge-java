@@ -31,41 +31,41 @@ jobs:
 
       - name: Build artifacts
         run: |
-          # ./build.sh package
+          ./build.sh package
 
       - name: Install hub
         run: |
-          # brew install hub
+          brew install hub
 
       - name: Deploy on github
         run: |
-          # cd artifacts
-          # if [ -z "$version" ]; then
-          #     version=$(ls gauge-java* | head -1 | sed "s/\.[^\.]*$//" | sed "s/gauge-java-//" | sed "s/-[a-z]*\.[a-z0-9_]*$//")
-          # fi
-          # artifacts=()
-          # dir=$(pwd)
-          # for i in $(ls); do
-          #     artifacts+="$dir/$i "
-          # done
-          # cd ..
-          # echo "---------------------------"
-          # echo "Updating release v$version"
-          # echo "---------------------------"
-          # echo -e "Gauge Java v$version\n\n" >desc.txt
-          # release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" gauge-java getgauge)
-          # echo "$release_description" >>desc.txt
-          # echo "Creating new draft for release v$version"
-          # hub release create -F ./desc.txt "v$version"
-          # rm -rf desc.txt
-          # echo "Start uploading assets..."
-          # for i in $(ls $artifacts); do
-          #     echo $i
-          #     hub release edit -m "" -a $i "v$version"
-          #     if [ $? -ne 0 ]; then
-          #         exit 1
-          #     fi
-          # done
+          cd artifacts
+          if [ -z "$version" ]; then
+              version=$(ls gauge-java* | head -1 | sed "s/\.[^\.]*$//" | sed "s/gauge-java-//" | sed "s/-[a-z]*\.[a-z0-9_]*$//")
+          fi
+          artifacts=()
+          dir=$(pwd)
+          for i in $(ls); do
+              artifacts+="$dir/$i "
+          done
+          cd ..
+          echo "---------------------------"
+          echo "Updating release v$version"
+          echo "---------------------------"
+          echo -e "Gauge Java v$version\n\n" >desc.txt
+          release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" gauge-java getgauge)
+          echo "$release_description" >>desc.txt
+          echo "Creating new draft for release v$version"
+          hub release create -F ./desc.txt "v$version"
+          rm -rf desc.txt
+          echo "Start uploading assets..."
+          for i in $(ls $artifacts); do
+              echo $i
+              hub release edit -m "" -a $i "v$version"
+              if [ $? -ne 0 ]; then
+                  exit 1
+              fi
+          done
 
       - name: Deploy on maven central
         run: |
@@ -73,11 +73,11 @@ jobs:
 
       - name: Bump up version
         run: |
+          git status
           git checkout master
           git pull --rebase
-          git status
-          # version=$(python update_version.py)
-          # git config --global user.name 'Github Actions'
-          # git config --global user.email 'actions@github.com'
-          # git commit -am "Bumping up -> $version"
-          # git push origin master
+          version=$(python update_version.py)
+          git config --global user.name 'Github Actions'
+          git config --global user.email 'actions@github.com'
+          git commit -am "Bumping up -> $version"
+          git push origin master
